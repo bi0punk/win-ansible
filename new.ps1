@@ -1,4 +1,3 @@
-# Requiere privilegios de administrador para acceder a información de IIS
 Import-Module WebAdministration
 
 Write-Host "===== INFORMACIÓN DEL SISTEMA =====" -ForegroundColor Cyan
@@ -30,7 +29,7 @@ foreach ($d in $discos) {
     Write-Host "$($d.DeviceID): Total: $total GB - Libre: $libre GB - Sistema de Archivos: $($d.FileSystem)"
 }
 
-# Información IIS
+# IIS
 Write-Host "`n===== IIS: POOLS, APLICACIONES Y SITIOS =====" -ForegroundColor Cyan
 
 # Application Pools
@@ -50,6 +49,11 @@ foreach ($site in $sites) {
     foreach ($binding in $site.Bindings.Collection) {
         Write-Host "    - $($binding.Protocol)://$($binding.BindingInformation)"
     }
+
+    # Ruta de logs
+    $logPath = Get-WebConfigurationProperty -Filter "system.applicationHost/sites/site[@name='$($site.Name)']/logFile" -Name "directory"
+    Write-Host "  Logs:"
+    Write-Host "    Ruta: $logPath"
 
     Write-Host "  Aplicaciones:"
     $apps = Get-WebApplication -Site $site.Name
