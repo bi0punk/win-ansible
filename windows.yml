@@ -1,0 +1,63 @@
+---
+- name: Ejecutar múltiples funciones en Windows y mostrar salida
+  hosts: windows_server
+  tasks:
+    - name: Obtener configuración IP (ipconfig)
+      win_command: ipconfig
+      register: ipconfig_output
+
+    - name: Mostrar salida de ipconfig
+      debug:
+        var: ipconfig_output.stdout_lines
+
+    - name: Descargar Visual Studio Code desde Internet
+      win_get_url:
+        url: "https://code.visualstudio.com/sha/download?build=stable&os=win32-x64-user"
+        dest: "C:\\Users\\Administrator\\Desktop\\VScode.exe"
+      register: download_output
+
+    - name: Mostrar salida de la descarga
+      debug:
+        var: download_output
+
+    # - name: Descargar repositorio Git, navegar y ejecutar Docker Compose
+    #   block:
+    #     - name: Clonar repositorio Git
+    #       win_command: git clone https://github.com/usuario/proyecto.git C:\\Users\\Administrator\\Desktop\\Proyecto
+    #       args:
+    #         creates: C:\\Users\\Administrator\\Desktop\\Proyecto
+    #       register: git_clone_output
+
+    #     - name: Mostrar salida del git clone
+    #       debug:
+    #         var: git_clone_output.stdout_lines
+
+    #     - name: Levantar Docker Compose
+    #       win_command: docker-compose up -d
+    #       args:
+    #         chdir: C:\\Users\\Administrator\\Desktop\\Proyecto
+    #       register: docker_output
+
+    #     - name: Mostrar salida de Docker Compose
+    #       debug:
+    #         var: docker_output.stdout_lines
+
+    - name: Copiar script PowerShell a Windows
+      win_copy:
+        src: ./config.ps1
+        dest: C:\\Users\\Administrator\\Desktop\\config.ps1
+      register: copy_output
+
+    - name: Mostrar resultado de la copia
+      debug:
+        var: copy_output
+
+    - name: Ejecutar script PowerShell en Windows
+      win_command: powershell.exe -ExecutionPolicy Bypass -NoProfile -Command "& { chcp 65001; C:\\Users\\Administrator\\Desktop\\config.ps1 }"
+      #powershell.exe -ExecutionPolicy Bypass -File C:\\Users\\Administrator\\Desktop\\config.ps1
+      
+      register: script_output
+
+    - name: Mostrar salida del script PowerShell
+      debug:
+        var: script_output.stdout_lines
