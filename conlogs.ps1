@@ -1,7 +1,9 @@
-# Requiere privilegios de administrador
+# Script de PowerShell SOLO DE LECTURA - No modifica archivos ni configuraciones
+# Requiere privilegios de administrador para acceder a IIS y WMI
+
 Import-Module WebAdministration
 
-Write-Host "===== INFORMACIÓN DEL SISTEMA =====" -ForegroundColor Cyan
+Write-Host "`n===== INFORMACIÓN DEL SISTEMA =====" -ForegroundColor Cyan
 
 # RAM
 $ram = Get-WmiObject Win32_OperatingSystem
@@ -60,20 +62,20 @@ foreach ($site in $sites) {
     }
 }
 
-# Búsqueda de directorios "logs" en E:\
-Write-Host "`n===== BÚSQUEDA DE DIRECTORIOS 'logs' EN E:\ =====" -ForegroundColor Cyan
+# Búsqueda de directorios 'log' o 'logs' (en cualquier combinación de mayúsculas/minúsculas) en E:\
+Write-Host "`n===== BÚSQUEDA DE DIRECTORIOS 'log' Y 'logs' EN E:\ =====" -ForegroundColor Cyan
 
 if (Test-Path "E:\") {
     try {
         $logsDirs = Get-ChildItem -Path "E:\" -Recurse -Directory -ErrorAction SilentlyContinue |
-                    Where-Object { $_.Name -match '^(?i)logs$' }
+                    Where-Object { $_.Name -match '^(?i)logs?$' }  # log o logs, case-insensitive
         
         if ($logsDirs.Count -gt 0) {
             foreach ($dir in $logsDirs) {
                 Write-Host "Directorio encontrado: $($dir.FullName)" -ForegroundColor Yellow
             }
         } else {
-            Write-Host "No se encontraron directorios llamados 'logs' en E:\"." -ForegroundColor Gray
+            Write-Host "No se encontraron directorios llamados 'log' o 'logs' en E:\" -ForegroundColor Gray
         }
     } catch {
         Write-Host "Error al buscar en E:\ $_" -ForegroundColor Red
